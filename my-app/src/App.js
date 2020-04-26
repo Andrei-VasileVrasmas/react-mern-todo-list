@@ -28,7 +28,7 @@ class App extends Component {
   render () {
     return (
       <div>
-        <h1>Todo list</h1>
+          Todo list
         <Day dayData={this.state.tasks[0]} />
         <Day dayData={this.state.tasks[1]} />
         <Day dayData={this.state.tasks[2]} />

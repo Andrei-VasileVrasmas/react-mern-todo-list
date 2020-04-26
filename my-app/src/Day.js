@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-
+import needle from 'needle'
 class Day extends Component {
   constructor (props) {
     super(props)
@@ -24,12 +24,27 @@ class Day extends Component {
     },()=> console.log(this.state))
   }
 
+  onSubmit = e =>{
+    e.preventDefault();
+    needle.post('localhost:5000/api/saveData',
+        {
+            day: this.state.name,
+            toDo: this.state.task
+        }, { json: true }, (err, res) => {
+            if (err) {
+                console.error(err);
+            };
+            console.log(res.body);
+        });
+  }
+
   render () {
     return (
       <div>
         <h3>Day: {this.state.name}</h3>
         <p>Task:</p>
         <input value={this.state.task} onChange={this.onChange}/>
+        <button className="submit" onClick={this.onSubmit}>Submit</button>
       </div>
     )
   }
