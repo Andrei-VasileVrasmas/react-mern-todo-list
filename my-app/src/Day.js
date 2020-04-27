@@ -7,12 +7,14 @@ class Day extends Component {
 
 
     this.state = {
+      id:dayData && dayData.id ? dayData.id:'',
       name: dayData && dayData.name ? dayData.name : '',
       task: dayData && dayData.task ? dayData.task : '' };
   }
 
   UNSAFE_componentWillReceiveProps = nextProps => {
     this.setState({
+      id:nextProps.dayData.id,
       name:nextProps.dayData.name,
       task:nextProps.dayData.task,
     })
@@ -28,6 +30,7 @@ class Day extends Component {
     e.preventDefault();
     needle.post('localhost:5000/api/saveData',
         {
+            _id:this.state.id,
             day: this.state.name,
             toDo: this.state.task
         }, { json: true }, (err, res) => {
@@ -42,7 +45,7 @@ class Day extends Component {
     return (
       <div>
         <h3>Day: {this.state.name}</h3>
-        <p>Task:</p>
+        <p>Task: </p>
         <input value={this.state.task} onChange={this.onChange}/>
         <button className="submit" onClick={this.onSubmit}>Submit</button>
       </div>

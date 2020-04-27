@@ -21,11 +21,13 @@ export const formatDays = data => {
     findDay(data, selectedDays[i]);
     if (dayFound) {
       formattedDays.push({
+        id:dayFound._id,
         name: dayFound.day,
         task: dayFound.toDo
       })
     } else {
       formattedDays.push({
+        id:'',
         name: selectedDays[i],
         task: ''
       })
