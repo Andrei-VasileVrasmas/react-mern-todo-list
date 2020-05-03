@@ -28,12 +28,12 @@ router.post('/', (req, res) => {
     $set: frontEndData
   }, {
     upsert: true
-  }, (err, res) => {
+  }, (err, response) => {
     if (err) {
       console.log(err);
     }
     console.log('one document inserted');
-
+    res.json({ result: true });
   });
 });
 

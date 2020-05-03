@@ -1,5 +1,10 @@
 import React, { Component } from 'react'
 import needle from 'needle'
+
+const sleep =(ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 class Day extends Component {
   constructor (props) {
     super(props)
@@ -9,7 +14,9 @@ class Day extends Component {
     this.state = {
       id:dayData && dayData.id ? dayData.id:'',
       name: dayData && dayData.name ? dayData.name : '',
-      task: dayData && dayData.task ? dayData.task : '' };
+      task: dayData && dayData.task ? dayData.task : '',
+      lastChangeTime: 0
+     };
   }
 
   UNSAFE_componentWillReceiveProps = nextProps => {
@@ -20,34 +27,59 @@ class Day extends Component {
     })
   }
 
-  onChange = e =>{
-    this.setState({
-      task:e.target.value
-    },()=> console.log(this.state))
+  shouldDataSend = async () => {
+    const waitingTime = 2000;
+    await sleep(waitingTime);
+    const currentTime = new Date().getTime();
+
+    if (currentTime - waitingTime >= this.state.lastChangeTime) {
+      this.onSubmit();
+    }
   }
 
+  onChange = e =>{
+    this.setState({
+      task:e.target.value,
+      lastChangeTime: new Date().getTime()
+    });
+    this.shouldDataSend();
+  }
+
+  onDelete = e => {
+  e.preventDefault();
+  needle.delete('localhost:5000/api/deleteData/', {
+    id:this.state.id,
+    day: this.state.name,
+    toDo: this.state.task
+  },{json:true}, (err, res) => {
+        if (err) {
+            console.error(err);
+        };
+        console.log(res.statusCode);
+    });
+};
+
   onSubmit = e =>{
-    e.preventDefault();
-    needle.post('localhost:5000/api/saveData',
-        {
-            _id:this.state.id,
-            day: this.state.name,
-            toDo: this.state.task
-        }, { json: true }, (err, res) => {
-            if (err) {
-                console.error(err);
-            };
-            console.log(res.body);
-        });
+
+  needle.post('localhost:5000/api/saveData', {
+    _id:this.state.id,
+    day: this.state.name,
+    toDo: this.state.task
+  }, { json: true }, (err, res) => {
+    console.log('TASK SAVED');
+    if (err) {
+      console.error(err);
+    };
+  });
   }
 
   render () {
     return (
       <div>
-        <h3>Day: {this.state.name}</h3>
-        <p>Task: </p>
+        <h4 className="pwhite">Day: {this.state.name}</h4>
+        <p className="phide">Task uuid:{this.state.id} </p>
         <input value={this.state.task} onChange={this.onChange}/>
-        <button className="submit" onClick={this.onSubmit}>Submit</button>
+        <button className="deleteBtn" onClick={this.onDelete}>Discard</button>
       </div>
     )
   }
