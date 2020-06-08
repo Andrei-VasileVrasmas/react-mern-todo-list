@@ -1,30 +1,36 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import needle from 'needle'
 
-const sleep =(ms) => {
+
+
+const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 class Day extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    const { dayData } = props;
+    const {
+      dayData
+    } = props;
 
 
     this.state = {
-      id:dayData && dayData.id ? dayData.id:'',
+      tasks:dayData,
+      id: dayData && dayData.id ? dayData.id : '',
       name: dayData && dayData.name ? dayData.name : '',
       task: dayData && dayData.task ? dayData.task : '',
       lastChangeTime: 0
-     };
+    };
   }
 
   UNSAFE_componentWillReceiveProps = nextProps => {
-    this.setState({
-      id:nextProps.dayData.id,
-      name:nextProps.dayData.name,
-      task:nextProps.dayData.task,
-    })
+      this.setState({
+        tasks:nextProps.dayData,
+        id: nextProps.dayData.id,
+        name: nextProps.dayData.name,
+        task: nextProps.dayData.task,
+      });
   }
 
   shouldDataSend = async () => {
@@ -33,44 +39,47 @@ class Day extends Component {
     const currentTime = new Date().getTime();
 
     if (currentTime - waitingTime >= this.state.lastChangeTime) {
-      this.onSubmit();
+       this.onSubmit().then(() => this.props.refreshState());
     }
   }
 
-  onChange = e =>{
+  onChange = e => {
     this.setState({
-      task:e.target.value,
+      task: e.target.value,
       lastChangeTime: new Date().getTime()
     });
     this.shouldDataSend();
   }
 
   onDelete = e => {
-  e.preventDefault();
-  needle.delete('localhost:5000/api/deleteData/', {
-    id:this.state.id,
-    day: this.state.name,
-    toDo: this.state.task
-  },{json:true}, (err, res) => {
-        if (err) {
-            console.error(err);
-        };
-        console.log(res.statusCode);
+    e.preventDefault();
+    needle.delete('localhost:5000/api/deleteData/', {
+      id: this.state.id,
+      day: this.state.name,
+      toDo: this.state.task
+    }, {
+      json: true
+    }, (err, res) => {
+      if (err) {
+        console.error(err);
+      };
+      console.log(res.statusCode);
+      this.props.refreshState();
     });
-};
+  };
 
-  onSubmit = e =>{
-
-  needle.post('localhost:5000/api/saveData', {
-    _id:this.state.id,
-    day: this.state.name,
-    toDo: this.state.task
-  }, { json: true }, (err, res) => {
-    console.log('TASK SAVED');
-    if (err) {
-      console.error(err);
-    };
-  });
+  onSubmit = e => {
+    return needle('post', 'localhost:5000/api/saveData', {
+      _id: this.state.id,
+      day:this.state.name,
+      toDo: this.state.task
+    }, {
+      json: true
+    }).then(resp => {
+        console.log('TASK SAVED');
+      }).catch((err) => {
+        console.log(err);
+      })
   }
 
   render () {
@@ -85,4 +94,5 @@ class Day extends Component {
   }
 }
 
-export default Day
+
+  export default Day
