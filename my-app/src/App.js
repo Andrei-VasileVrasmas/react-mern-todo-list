@@ -16,19 +16,6 @@ class App extends Component {
 
   componentDidMount = () => {
     this.refreshState();
-    /*
-     needle.get('http://localhost:5000/api/getData', (err,res) => {
-      if (err) {
-        console.log(err)
-      } else {
-        const formattedDays = formatDays(res.body);
-
-        this.setState({
-          tasks:formattedDays
-        });
-      }
-    });
-    */
   }
 
 
