@@ -30,7 +30,6 @@ class App extends Component {
         <Day dayData={this.state.tasks[4]} refreshState={this.refreshState}/>
         <Day dayData={this.state.tasks[5]} refreshState={this.refreshState}/>
         <Day dayData={this.state.tasks[6]} refreshState={this.refreshState}/>
-
       </div>
     )
   }
